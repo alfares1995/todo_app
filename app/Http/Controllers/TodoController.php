@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TodoController extends Controller
 {
@@ -12,7 +14,7 @@ class TodoController extends Controller
     public function index()
     {
         return inertia('Todos/Index', [
-            'todos' => Todo::all(),
+            'todos' => auth()->user()->todos()->latest()->get(), // Fetch todos for the authenticated user
         ]);
     }
 
@@ -21,7 +23,7 @@ class TodoController extends Controller
      */
     public function create()
     {
-        return inertia('todos/create');
+        return inertia('Todos/Create'); // Fixed capitalization for consistency
     }
 
     /**
@@ -29,60 +31,59 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        Todo::create($request->only('title', 'description'));
+        $request->user()->todos()->create($validated);
 
-        return redirect()->route('todos.index');
+        return redirect()->route('todos.index')->with('success', 'Todo created successfully!');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Todo $todo)
     {
-        //
+        // Implementation can be added as needed
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Todo $todo) // Changed parameter type to Todo for consistency
     {
-        //
+        return inertia('Todos/Edit', [
+            'todo' => $todo,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    // public function update(Request $request, Todo $todo)
-    // {
-    //     $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'description' => 'nullable|string',
-    //         'completed' => 'boolean',
-    //     ]);
+    public function update(Request $request, Todo $todo)
+    {
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'completed' => 'boolean',
+        ]);
 
-    //     $todo->update($request->only('title', 'description', 'completed'));
+        $todo->update($validated);
 
-    //     return redirect()->route('todos.index');
-    // }
-
-    public function update(Request $request, Todo $todo) {
-        $todo->update(['completed' => $request->completed]);
-        return back();
+        return redirect()->route('todos.index')->with('success', 'Todo updated successfully!');
     }
-    
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Todo $todo)
     {
+       // $this->authorize('delete', $todo);
         $todo->delete();
-        return redirect()->route('todos.index');
+
+        return redirect()->route('todos.index')->with('success', 'Todo deleted successfully!');
     }
+
 }

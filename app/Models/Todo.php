@@ -13,8 +13,15 @@ class Todo extends Model
     // Fields that can be mass-assigned
     protected $fillable = ['title', 'description', 'completed'];
 
+   // protected $primaryKey = 'todos_id'; 
+
     // Default values for fields
     protected $attributes = [
         'completed' => false,
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

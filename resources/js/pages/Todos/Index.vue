@@ -1,5 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-
 <template>
     <AppLayout>
         <div class="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -65,7 +63,7 @@ interface Todo {
     completed: boolean;
 }
 
-const props = defineProps<{
+defineProps<{
     todos: Todo[];
 }>();
 

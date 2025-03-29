@@ -53,14 +53,21 @@
     </AppLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useForm } from '@inertiajs/vue3'
 
-const props = defineProps({
-    todos: Array,
-});
+interface Todo {
+    id: number;
+    title: string;
+    description: string;
+    completed: boolean;
+}
+
+const props = defineProps<{
+    todos: Todo[];
+}>();
 
 // Form for adding a new todo
 const form = useForm({
@@ -77,7 +84,7 @@ function submit() {
 }
 
 // Toggle todo completion status
-function completeTodo(todo) {
+function completeTodo(todo: { id: any; completed: any; }) {
     router.put(`/todos/${todo.id}`, {
         completed: !todo.completed
     }, {
@@ -94,7 +101,7 @@ function completeTodo(todo) {
 
 
 // Delete a todo
-const deleteTodo = (id) => {
+const deleteTodo = (id: any) => {
      
     if (confirm(`Are you sure you want to delete this todo? ${id}`)) {
         router.delete(`/todos/${id}`, {
